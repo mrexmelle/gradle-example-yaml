@@ -1,0 +1,31 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.yaml:snakeyaml:1.23'
+    }
+}
+
+task createYml {
+    doLast {
+        def map=new LinkedHashMap<String, Object>();
+        map['spring.profiles.active'] = 'local';
+        map['server'] = ['port' : 20001];
+        map['spring'] = ['profiles' : 'local'];
+        map['line.bot'] = [
+            'handler.path' : '/bot/webhook',
+            'channel-token' : channelToken,
+            'channel-secret' : channelSecret
+        ];
+
+        def dopt = new org.yaml.snakeyaml.DumperOptions();
+        dopt.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK);
+        dopt.setPrettyFlow(true);
+        def cfg = new org.yaml.snakeyaml.Yaml(dopt);
+        FileWriter fw = new FileWriter("app.yml");
+        cfg.dump(map, fw);
+    }
+}
